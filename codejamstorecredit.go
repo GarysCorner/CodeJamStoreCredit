@@ -1,7 +1,14 @@
 //File:		codejamstorecredit.go
 //Author:	Gary Bezet
+//Date:		2016-06-05
 //Desc:		This program is designed to solve Google Code Jam's qualification round for Africa 2010.  I did not compete in the codejam but I was having trouble figuring out what to code so I decided to give it a shot a test problem.  Also I'm learning Go.
 //Problem:	https://code.google.com/codejam/contest/351101/dashboard#s=p0
+
+//Analysis:	Google grades the problem as correct, it took 10.4ms to solve the large problem and 269us to solve the small one.  Originally I planned on sorting everything and breaking my solving for loops when additional values for the loop wouldn't make since.  Since the solve time is so low this is not nessisary
+
+//Comments:	I hacked this program together in an afternoon, it seems to run pretty well even though its my first real attempt at golang.  Hopefully the code isn't too hacky
+
+
 
 package main
 
@@ -56,7 +63,7 @@ func main() {
 
 	printProgramOptions()
 	
-	printCases() //this is just for testing
+	//printCases() //this is just for testing
 
 	//solve them all
 	for _, v := range testcases {
@@ -93,7 +100,7 @@ func initflags() {
 //prints program settings
 func printProgramOptions() {
 	printErrln("InFile:\t", infileopt)
-	printErrln("OutFile:\t", outfileopt)
+	printErrln("OutFile:\t", outfileopt, "\n")
 	
 
 }
@@ -222,7 +229,7 @@ func inputFile(reader *bufio.Reader) {
 						
 						case price > testcases[casenum].credit:  //ignore price if too high
 							
-							printErrln("Case#", casenum+1, " item#", itemnum+1, " price too high!")  //for testing
+							//printErrln("Case#", casenum+1, " item#", itemnum+1, " price too high!")  //for testing
 						
 						case price > halfway:
 							testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, price )
