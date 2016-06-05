@@ -13,7 +13,7 @@ import (
 		"strings"
 		"strconv"
 		"time"
-		"sort"
+		//"sort"
 	)
 
 //global variables
@@ -32,10 +32,11 @@ var starttime time.Time = time.Now()
 //structures
 type testcase struct {
 	num, credit, items int
-	priceshigh, priceslow []int
-	
+	priceshigh, priceshighnum, priceslow, priceslownum []int
 	
 }
+
+
 
 
 //main entry point
@@ -57,7 +58,10 @@ func main() {
 	
 	printCases() //this is just for testing
 
-	
+	//solve them all
+	for _, v := range testcases {
+		v.solve()
+	}
 
 }
 
@@ -136,13 +140,6 @@ func printErrln( line ...interface{} ) {
 
 
 
-//print a solution line either to stdout or file
-func printSolution( line ...interface{} ) {
-	fmt.Fprintln(outfile, line... )
-
-}
-
-
 //process input file
 func inputFile(reader *bufio.Reader) {
 
@@ -199,8 +196,12 @@ func inputFile(reader *bufio.Reader) {
 					printErrln("Error:  items #s didn't match for case# ", casenum)
 					os.Exit(6)
 				}
+
 				testcases[casenum].priceshigh = make([]int, 0, len(itemstring) )
 				testcases[casenum].priceslow = make([]int, 0, len(itemstring) )
+				
+				testcases[casenum].priceshighnum = make([]int, 0, len(itemstring) )
+				testcases[casenum].priceslownum = make([]int, 0, len(itemstring) )
 
 				halfwayexact := false //make sure halway values get in piceslow then priceshigh
 
@@ -225,17 +226,21 @@ func inputFile(reader *bufio.Reader) {
 						
 						case price > halfway:
 							testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, price )
+							testcases[casenum].priceshighnum = append( testcases[casenum].priceshighnum, itemnum )
 							
 						case price < halfway:
 							testcases[casenum].priceslow = append( testcases[casenum].priceslow, price )
+							testcases[casenum].priceslownum = append( testcases[casenum].priceslownum, itemnum )
 					
 						
 						case price == halfway:  //special case may be better way, put one in low and the rest in high
 							
 							if halfwayexact == true {
 								testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, price )
+								testcases[casenum].priceshighnum = append( testcases[casenum].priceshighnum, itemnum )
 							} else {
 								testcases[casenum].priceslow = append( testcases[casenum].priceslow, price )
+								testcases[casenum].priceslownum = append( testcases[casenum].priceslownum, itemnum )
 								halfwayexact = true
 							} 
 							
@@ -244,8 +249,8 @@ func inputFile(reader *bufio.Reader) {
 				
 				}
 				
-				sort.Ints(testcases[casenum].priceshigh )
-				sort.Ints(testcases[casenum].priceslow )
+				//sort.Ints(testcases[casenum].priceshigh )
+				//sort.Ints(testcases[casenum].priceslow )
 
 				casenum++
 				
@@ -274,8 +279,41 @@ func printCases() {
 		printErrln("# of Items\t", v.items)
 		printErrln("PriceLow:\t", v.priceslow)
 		printErrln("PriceHigh:\t", v.priceshigh, "\n")	
+		
+		printErrln("PriceLowNum:\t", v.priceslownum)
+		printErrln("PriceHighNum:\t", v.priceshighnum, "\n")	
 	}	
 
+}
+
+//solve a case
+func (self testcase) solve() {
+	
+	for i := 0; i < len(self.priceslow); i++ { //increment forward over prices low
+	
+		for c:= len(self.priceshigh) - 1; c >= 0; c-- {  //increment backwords over prices high
+		
+			if ( self.priceslow[i] + self.priceshigh[c] ) == self.credit {  //found it print solution
+				
+				printErrln( "Solved Case: #", self.num )
+				
+				if self.priceslownum[i] < self.priceshighnum[c] { //print in correct order
+					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceslownum[i] + 1, self.priceshighnum[c] + 1)
+
+				} else {
+
+					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceshighnum[c] + 1, self.priceslownum[i] + 1)
+
+				}
+			
+			}
+		
+		}
+		
+	} 
+	
+
+			
 }
 
 
