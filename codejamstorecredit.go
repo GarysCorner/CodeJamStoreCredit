@@ -121,8 +121,8 @@ func openFiles() {
 	}
 
 	if outfileopt == "-"  {
-		outfile = os.Stderr
-		outfileopt = "Stderr"
+		outfile = os.Stdout
+		outfileopt = "Stdout"
 	} else {
 		outfile, err = os.Create(outfileopt)
 
