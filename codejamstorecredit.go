@@ -72,7 +72,7 @@ func main() {
 	defer infile.Close()
 	defer outfile.Close()
 
-	defer printStats() //must run before close of outfile in case outfile is stdout
+	
 
 	printProgramOptions()
 	
@@ -80,18 +80,19 @@ func main() {
 
 	//solve them all
 	
-	testcasearray( testcases ).solveall()
+	iter, possibleiter := testcasearray( testcases ).solveall()
 	
-//	for _, v := range testcases {
-//		v.solve()
-//	}
+	printStats(iter, possibleiter)
+
 
 }
 
 
 //print the stats after progra ends
-func printStats() {
+func printStats(iter, possibleiter int) {
+
 	printErrln( "\nTotal time:  ", time.Since( starttime ))
+	printErrln( "Solved in ", iter, "/", possibleiter, "iterations %", float32(iter)/float32(possibleiter)*100  )
 }
 
 //get the flags from command line
@@ -319,19 +320,24 @@ func (self pricelistarray) Less(i, j int) bool {  //Less() function for []pricel
 
 
 //solve a case
-func (self testcase) solve() {
+func (self testcase) solve() (int, int) {
 
-	var totalcost int
+	var totalcost, iter, possibleiter int  //iter keep track of iterations
 	
+	solver:
 	for i := 0; i < len(self.priceslow); i++ { //increment forward over prices low
 	
 		for c:= len(self.priceshigh) - 1; c >= 0; c-- {  //increment backwords over prices high
+		
+			iter++
 		
 			totalcost = self.priceslow[i].prices + self.priceshigh[c].prices
 		
 			if totalcost == self.credit {  //found it print solution
 				
-				printErrln( "Solved Case: #", self.num )
+				possibleiter = len(self.priceshigh) * len(self.priceslow)
+				
+				printErrln( "Solved Case: #", self.num, "in", iter, "/", possibleiter, " iterations" )
 				
 				if self.priceslow[i].pricenum < self.priceshigh[c].pricenum { //print in correct order
 					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceslow[i].pricenum + 1, self.priceshigh[c].pricenum + 1)
@@ -341,9 +347,13 @@ func (self testcase) solve() {
 					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceshigh[c].pricenum + 1, self.priceslow[i].pricenum + 1)
 
 				}
-				break  //added to break loop on solution shouldn't have missed this
+				
+				//printErrln("Broke because solution #", self.num ,"found");  //for testing
+				break solver  //added to break loop on solution shouldn't have missed this  
+				
 			
 			} else if totalcost < self.credit {
+				//printErrln( "Broke because testing value #", i, "for case #", self.num, "no longer makes since" )
 				break //break when cost is to high because pricelow can't be the right solution	
 			}
 		
@@ -351,17 +361,23 @@ func (self testcase) solve() {
 		
 	} 
 	
-
+	return iter, possibleiter //return the number of iterations
 			
 }
 
 
 
-func (self testcasearray) solveall() {
+func (self testcasearray) solveall() (int, int) {
+
+	var itertotal, possibleitertotal int
 
 	for _, i := range self {
-		i.solve()
+		iter, possibleiter := i.solve()
+		itertotal += iter
+		possibleitertotal += possibleiter
 	}
+
+	return itertotal, possibleitertotal
 
 }
 
