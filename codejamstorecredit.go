@@ -20,7 +20,7 @@ import (
 		"strings"
 		"strconv"
 		"time"
-		//"sort"
+		"sort"
 	)
 
 //global variables
@@ -37,11 +37,33 @@ var starttime time.Time = time.Now()
 
 
 //structures
+
+
+
+type pricelistarray []pricelist
+
+func (self pricelistarray) Len() int {
+	return len(self)
+}
+
+func (self pricelistarray) Swap( i, j int) {
+	self[i], self[j] = self[j], self[i]
+}
+
+func (self pricelistarray) Less(i, j int) bool {
+	return self[i].prices < self[j].prices
+}
+
+type pricelist struct {
+	prices, pricenum int
+}
+
 type testcase struct {
 	num, credit, items int
-	priceshigh, priceshighnum, priceslow, priceslownum []int
+	priceshigh, priceslow []pricelist
 	
 }
+
 
 
 
@@ -204,11 +226,9 @@ func inputFile(reader *bufio.Reader) {
 					os.Exit(6)
 				}
 
-				testcases[casenum].priceshigh = make([]int, 0, len(itemstring) )
-				testcases[casenum].priceslow = make([]int, 0, len(itemstring) )
+				testcases[casenum].priceshigh = make([]pricelist, 0, len(itemstring) )
+				testcases[casenum].priceslow = make([]pricelist, 0, len(itemstring) )
 				
-				testcases[casenum].priceshighnum = make([]int, 0, len(itemstring) )
-				testcases[casenum].priceslownum = make([]int, 0, len(itemstring) )
 
 				halfwayexact := false //make sure halway values get in piceslow then priceshigh
 
@@ -232,22 +252,21 @@ func inputFile(reader *bufio.Reader) {
 							//printErrln("Case#", casenum+1, " item#", itemnum+1, " price too high!")  //for testing
 						
 						case price > halfway:
-							testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, price )
-							testcases[casenum].priceshighnum = append( testcases[casenum].priceshighnum, itemnum )
+																			
+							testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, pricelist{prices: price, pricenum: itemnum} )
 							
 						case price < halfway:
-							testcases[casenum].priceslow = append( testcases[casenum].priceslow, price )
-							testcases[casenum].priceslownum = append( testcases[casenum].priceslownum, itemnum )
+							testcases[casenum].priceslow = append( testcases[casenum].priceslow, pricelist{ prices: price, pricenum: itemnum} )
 					
 						
 						case price == halfway:  //special case may be better way, put one in low and the rest in high
 							
 							if halfwayexact == true {
-								testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, price )
-								testcases[casenum].priceshighnum = append( testcases[casenum].priceshighnum, itemnum )
+								testcases[casenum].priceshigh = append( testcases[casenum].priceshigh, pricelist{prices: price, pricenum: itemnum})
+
 							} else {
-								testcases[casenum].priceslow = append( testcases[casenum].priceslow, price )
-								testcases[casenum].priceslownum = append( testcases[casenum].priceslownum, itemnum )
+								testcases[casenum].priceslow = append( testcases[casenum].priceslow, pricelist{prices: price, pricenum: itemnum} )
+
 								halfwayexact = true
 							} 
 							
@@ -256,8 +275,8 @@ func inputFile(reader *bufio.Reader) {
 				
 				}
 				
-				//sort.Ints(testcases[casenum].priceshigh )
-				//sort.Ints(testcases[casenum].priceslow )
+				sort.Sort(pricelistarray(testcases[casenum].priceshigh) )
+				sort.Sort(pricelistarray(testcases[casenum].priceslow) )
 
 				casenum++
 				
@@ -287,8 +306,7 @@ func printCases() {
 		printErrln("PriceLow:\t", v.priceslow)
 		printErrln("PriceHigh:\t", v.priceshigh, "\n")	
 		
-		printErrln("PriceLowNum:\t", v.priceslownum)
-		printErrln("PriceHighNum:\t", v.priceshighnum, "\n")	
+
 	}	
 
 }
@@ -300,18 +318,19 @@ func (self testcase) solve() {
 	
 		for c:= len(self.priceshigh) - 1; c >= 0; c-- {  //increment backwords over prices high
 		
-			if ( self.priceslow[i] + self.priceshigh[c] ) == self.credit {  //found it print solution
+			if ( self.priceslow[i].prices + self.priceshigh[c].prices ) == self.credit {  //found it print solution
 				
 				printErrln( "Solved Case: #", self.num )
 				
-				if self.priceslownum[i] < self.priceshighnum[c] { //print in correct order
-					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceslownum[i] + 1, self.priceshighnum[c] + 1)
+				if self.priceslow[i].pricenum < self.priceshigh[c].pricenum { //print in correct order
+					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceslow[i].pricenum + 1, self.priceshigh[c].pricenum + 1)
 
 				} else {
 
-					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceshighnum[c] + 1, self.priceslownum[i] + 1)
+					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceshigh[c].pricenum + 1, self.priceslow[i].pricenum + 1)
 
 				}
+				break  //added to break loop on solution
 			
 			}
 		
