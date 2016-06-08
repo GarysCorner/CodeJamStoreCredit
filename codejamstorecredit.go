@@ -2,11 +2,12 @@
 //Author:	Gary Bezet
 //Date:		2016-06-05
 //Desc:		This program is designed to solve Google Code Jam's qualification round for Africa 2010.  I did not compete in the codejam but I was having trouble figuring out what to code so I decided to give it a shot a test problem.  Also I'm learning Go.
+//Web:		https://github.com/GarysCorner/CodeJamStoreCredit
 //Problem:	https://code.google.com/codejam/contest/351101/dashboard#s=p0
 
-//Analysis:	Google grades the problem as correct, it took 10.4ms to solve the large problem and 269us to solve the small one.  Originally I planned on sorting everything and breaking my solving for loops when additional values for the loop wouldn't make since.  Since the solve time is so low this is not nessisary
+//Analysis:	Google grades the problem as correct, it took 10.4ms to solve the large problem and 269us to solve the small one (originally).  Originally I planned on sorting everything and breaking my solving for loops when additional values for the loop wouldn't make since (added sorting).  Since the solve time is so low this is not nessisary
 
-//Comments:	I hacked this program together in an afternoon, it seems to run pretty well even though its my first real attempt at golang.  Hopefully the code isn't too hacky
+//Comments:	I hacked this program together in an afternoon (I've made a few changes since then see git history), it seems to run pretty well even though its my first real attempt at golang.  Hopefully the code isn't too hacky
 
 
 
@@ -40,22 +41,20 @@ var starttime time.Time = time.Now()
 
 
 
-type pricelistarray []pricelist
-
-func (self pricelistarray) Len() int {
-	return len(self)
-}
-
-func (self pricelistarray) Swap( i, j int) {
-	self[i], self[j] = self[j], self[i]
-}
-
-func (self pricelistarray) Less(i, j int) bool {
-	return self[i].prices < self[j].prices
-}
+type pricelistarray []pricelist  //type for sorting
 
 type pricelist struct {
 	prices, pricenum int
+}
+
+type testcasearray []testcase
+
+func (self testcasearray) solveall() {
+
+	for _, i := range self {
+		i.solve()
+	}
+
 }
 
 type testcase struct {
@@ -88,9 +87,12 @@ func main() {
 	//printCases() //this is just for testing
 
 	//solve them all
-	for _, v := range testcases {
-		v.solve()
-	}
+	
+	testcasearray( testcases ).solveall()
+	
+//	for _, v := range testcases {
+//		v.solve()
+//	}
 
 }
 
@@ -340,6 +342,19 @@ func (self testcase) solve() {
 	
 
 			
+}
+
+
+func (self pricelistarray) Len() int {  //return length of []pricelist for sorting
+	return len(self)
+}
+
+func (self pricelistarray) Swap( i, j int) {  //swap []pricelist tems for storting
+	self[i], self[j] = self[j], self[i]
+}
+
+func (self pricelistarray) Less(i, j int) bool {  //Less() function for []pricelist for sorting
+	return self[i].prices < self[j].prices
 }
 
 
