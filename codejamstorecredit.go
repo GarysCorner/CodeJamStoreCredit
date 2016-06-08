@@ -49,14 +49,6 @@ type pricelist struct {
 
 type testcasearray []testcase
 
-func (self testcasearray) solveall() {
-
-	for _, i := range self {
-		i.solve()
-	}
-
-}
-
 type testcase struct {
 	num, credit, items int
 	priceshigh, priceslow []pricelist
@@ -313,14 +305,31 @@ func printCases() {
 
 }
 
+func (self pricelistarray) Len() int {  //return length of []pricelist for sorting
+	return len(self)
+}
+
+func (self pricelistarray) Swap( i, j int) {  //swap []pricelist tems for storting
+	self[i], self[j] = self[j], self[i]
+}
+
+func (self pricelistarray) Less(i, j int) bool {  //Less() function for []pricelist for sorting
+	return self[i].prices < self[j].prices
+}
+
+
 //solve a case
 func (self testcase) solve() {
+
+	var totalcost int
 	
 	for i := 0; i < len(self.priceslow); i++ { //increment forward over prices low
 	
 		for c:= len(self.priceshigh) - 1; c >= 0; c-- {  //increment backwords over prices high
 		
-			if ( self.priceslow[i].prices + self.priceshigh[c].prices ) == self.credit {  //found it print solution
+			totalcost = self.priceslow[i].prices + self.priceshigh[c].prices
+		
+			if totalcost == self.credit {  //found it print solution
 				
 				printErrln( "Solved Case: #", self.num )
 				
@@ -332,8 +341,10 @@ func (self testcase) solve() {
 					fmt.Fprintf(outfile, "Case #%d: %d %d\n", self.num, self.priceshigh[c].pricenum + 1, self.priceslow[i].pricenum + 1)
 
 				}
-				break  //added to break loop on solution
+				break  //added to break loop on solution shouldn't have missed this
 			
+			} else if totalcost < self.credit {
+				break //break when cost is to high because pricelow can't be the right solution	
 			}
 		
 		}
@@ -345,16 +356,13 @@ func (self testcase) solve() {
 }
 
 
-func (self pricelistarray) Len() int {  //return length of []pricelist for sorting
-	return len(self)
-}
 
-func (self pricelistarray) Swap( i, j int) {  //swap []pricelist tems for storting
-	self[i], self[j] = self[j], self[i]
-}
+func (self testcasearray) solveall() {
 
-func (self pricelistarray) Less(i, j int) bool {  //Less() function for []pricelist for sorting
-	return self[i].prices < self[j].prices
+	for _, i := range self {
+		i.solve()
+	}
+
 }
 
 
