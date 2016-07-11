@@ -24,49 +24,42 @@ Output
 
 For each test case, output one line containing "Case #x: " followed by the indices of the two items whose price adds up to the store credit. The lower index should be output first.
 
-Limits
-
+###Limits
+```
 5 ≤ C ≤ 1000
 1 ≤ P ≤ 1000
+```
 
-Small dataset
-
+###Small dataset
+```
 N = 10
 3 ≤ I ≤ 100
-
-Large dataset
-
+```
+###Large dataset
+```
 N = 50
 3 ≤ I ≤ 2000
-
+```
 Sample
 
 
 ###Input
+```
 3
-
 100
-
 3
-
 5 75 25
-
 200
-
 7
-
 150 24 79 50 88 345 3
-
 8
-
 8
-
 2 1 9 4 4 56 90 3
+```
 
 ###Output
+```
 Case #1: 2 3
-
 Case #2: 1 4
-
 Case #3: 4 5
-
+```
